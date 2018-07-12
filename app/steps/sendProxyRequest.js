@@ -53,7 +53,18 @@ function sendProxyRequest(Container) {
         if (contentType && (contentType.indexOf('x-www-form-urlencoded')>=0 || contentType.indexOf('application/x-www-form-urlencoded')>=0)) {
           try {
             var params = JSON.parse(body);
-            body = Object.keys(params).map(function(k) { return k + '=' + params[k]; }).join('&');
+            var keyValues = []
+            Object.keys(params).forEach(function(k) {
+              if(Array.isArray(params[k])){
+                params[k].forEach(function(val){
+                  keyValues.push(encodeURIComponent(k+'[]') + '=' + encodeURIComponent(val)); 
+                })
+              }else{
+                keyValues.push(encodeURIComponent(k) + '=' + encodeURIComponent(params[k])); 
+              }              
+            });
+
+            body = keyValues.join('&');
           } catch (e) {
             // bodyContent is not json-format
           }
